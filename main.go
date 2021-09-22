@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/disharjayanth/golangBackend/data"
 )
@@ -25,9 +26,9 @@ func main() {
 
 	server := http.Server{
 		// for deployment add os.Getenv("PORT")
-		// Addr: ":" + os.Getenv("PORT"),
+		Addr: ":" + os.Getenv("PORT"),
 		// (for local development)
-		Addr: "127.0.0.1:3000",
+		// Addr: "127.0.0.1:3000",
 	}
 	http.HandleFunc("/", mainPage)
 	http.HandleFunc("/signup", signUpPage)
