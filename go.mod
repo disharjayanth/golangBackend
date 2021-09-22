@@ -1,5 +1,6 @@
 module github.com/disharjayanth/golangBackend
 
+// +heroku goVersion go1.17
 go 1.17
 
 require go.mongodb.org/mongo-driver v1.7.2
