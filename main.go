@@ -25,8 +25,9 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	server := http.Server{
+		// for deployment add os.Getenv("PORT")
 		Addr: ":" + os.Getenv("PORT"),
-		// Addr: "127.0.0.1:3000",
+		// Addr: "127.0.0.1:3000", (for local development)
 	}
 	http.HandleFunc("/", mainPage)
 	http.HandleFunc("/signup", signUpPage)
