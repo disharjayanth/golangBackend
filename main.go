@@ -1,17 +1,24 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/disharjayanth/golangBackend/data"
 )
 
 var temp *template.Template
 var err error
+
+type album struct {
+	UserId int    `json:"userId"`
+	Id     int    `json:"id"`
+	Title  string `json:"title"`
+}
 
 func init() {
 	temp, err = template.ParseGlob("template/*.html")
@@ -26,9 +33,9 @@ func main() {
 
 	server := http.Server{
 		// for deployment add os.Getenv("PORT")
-		Addr: ":" + os.Getenv("PORT"),
+		// Addr: ":" + os.Getenv("PORT"),
 		// (for local development)
-		// Addr: "127.0.0.1:3000",
+		Addr: "127.0.0.1:3000",
 	}
 	http.HandleFunc("/", mainPage)
 	http.HandleFunc("/signup", signUpPage)
@@ -83,7 +90,7 @@ func signInPage(w http.ResponseWriter, r *http.Request) {
 			Password: password,
 		}
 		if user.Auth() {
-			http.Redirect(w, r, "http://www.omdbapi.com/", http.StatusSeeOther)
+			http.Redirect(w, r, "/movie", http.StatusSeeOther)
 		} else {
 			temp.ExecuteTemplate(w, "signIn.html", "Username or password not correct!")
 		}
@@ -91,5 +98,23 @@ func signInPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func moviePage(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Movie Page"))
+	url := "https://jsonplaceholder.typicode.com/albums"
+
+	req, _ := http.NewRequest("GET", url, nil)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Println("Error making request to client:", err)
+	}
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	var albums []album
+	err = json.Unmarshal(body, &albums)
+	if err != nil {
+		log.Println("Error:", err)
+	}
+
+	temp.ExecuteTemplate(w, "movie.html", albums)
 }
