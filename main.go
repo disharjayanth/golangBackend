@@ -20,6 +20,9 @@ func init() {
 }
 
 func main() {
+	// if go code crashes, it prints file name and also line number
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	http.HandleFunc("/", mainPage)
 	http.HandleFunc("/signup", signUpPage)
 	http.HandleFunc("/signin", signInPage)

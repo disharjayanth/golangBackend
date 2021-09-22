@@ -38,8 +38,13 @@ type User struct {
 func (u *User) Store() bool {
 	var result bson.M
 	err := collection.FindOne(context.Background(), bson.D{{"name", u.Name}}).Decode(&result)
-	if result["name"].(string) == u.Name {
-		return false
+	if err != nil {
+		log.Println("Error finding user signup info", err)
+	}
+	if result["name"] != nil {
+		if result["name"].(string) == u.Name {
+			return false
+		}
 	}
 	_, err = collection.InsertOne(context.Background(), u)
 	if err != nil {
@@ -54,10 +59,14 @@ func (u *User) Auth() bool {
 	err := collection.FindOne(context.Background(), bson.D{{"name", u.Name}}).Decode(&result)
 	if err != nil {
 		log.Println("User not authorized")
-		// return false
+		return false
 	}
-	if result["name"].(string) == u.Name && result["password"].(string) == u.Password {
-		return true
+	if result["name"] != nil {
+		if result["name"].(string) == u.Name && result["password"].(string) == u.Password {
+			return true
+		} else {
+			return false
+		}
 	} else {
 		return false
 	}
