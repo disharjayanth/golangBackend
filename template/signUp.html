@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Sign Up</title>
+    <link type="text/css" rel="stylesheet" href="/stylesheet/main.css" />
+  </head>
+  <body>
+    <div>
+      <h1>Sign Up</h1>
+      <form onsubmit="/signup/" method="POST">
+        <label>User Name:</label>
+        <input name="name" type="text" />
+        <label>Password:</label>
+        <input name="password" type="password" />
+        <button>Sign Up!</button>
+      </form>
+      <div class="userAlreadyRegisteredError">{{.}}</div>
+      <h3><a href="/signin">Sign In?</a></h3>
+    </div>
+  </body>
+</html>
