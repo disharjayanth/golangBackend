@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/disharjayanth/golangBackend/data"
 )
@@ -23,6 +24,10 @@ func main() {
 	// if go code crashes, it prints file name and also line number
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
+	server := http.Server{
+		Addr: ":" + os.Getenv("PORT"),
+		// Addr: "127.0.0.1:3000",
+	}
 	http.HandleFunc("/", mainPage)
 	http.HandleFunc("/signup", signUpPage)
 	http.HandleFunc("/signin", signInPage)
@@ -32,7 +37,8 @@ func main() {
 	http.Handle("/stylesheet/", http.StripPrefix("/stylesheet", http.FileServer(http.Dir("template/stylesheet/"))))
 
 	log.Println("Server serving @PORT: 3000")
-	http.ListenAndServe(":3000", nil)
+
+	server.ListenAndServe()
 }
 
 func mainPage(w http.ResponseWriter, r *http.Request) {
