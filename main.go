@@ -93,7 +93,7 @@ func signInPage(w http.ResponseWriter, r *http.Request) {
 		if user.Auth() {
 			http.Redirect(w, r, "/movie", http.StatusSeeOther)
 		} else {
-			temp.ExecuteTemplate(w, "signIn.html", "Username or password not correct!")
+			temp.ExecuteTemplate(w, "signIn.html", "Username or password incorrect!")
 		}
 	}
 }
