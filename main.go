@@ -7,13 +7,19 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/disharjayanth/golangBackend/data"
+	"github.com/gorilla/sessions"
 )
 
 var temp *template.Template
 var err error
+
+var (
+	// key must be 16, 24 or 32 bytes long
+	key   = []byte("super-secret-key")
+	store = sessions.NewCookieStore(key)
+)
 
 type album struct {
 	UserId int    `json:"userId"`
@@ -34,9 +40,9 @@ func main() {
 
 	server := http.Server{
 		// for deployment add os.Getenv("PORT")
-		Addr: ":" + os.Getenv("PORT"),
+		// Addr: ":" + os.Getenv("PORT"),
 		// (for local development)
-		// Addr: "127.0.0.1:3000",
+		Addr: "127.0.0.1:3000",
 	}
 	http.HandleFunc("/", mainPage)
 	http.HandleFunc("/signup", signUpPage)
@@ -91,6 +97,12 @@ func signInPage(w http.ResponseWriter, r *http.Request) {
 			Password: password,
 		}
 		if user.Auth() {
+			session, err := store.Get(r, "cookie-name")
+			if err != nil {
+				log.Println("Error creating session")
+			}
+			session.Values["authenticated"] = true
+			session.Save(r, w)
 			http.Redirect(w, r, "/movie", http.StatusSeeOther)
 		} else {
 			temp.ExecuteTemplate(w, "signIn.html", "Username or password incorrect!")
@@ -99,23 +111,32 @@ func signInPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func moviePage(w http.ResponseWriter, r *http.Request) {
-	url := "https://jsonplaceholder.typicode.com/albums"
-
-	req, _ := http.NewRequest("GET", url, nil)
-
-	res, err := http.DefaultClient.Do(req)
+	session, err := store.Get(r, "cookie-name")
 	if err != nil {
-		fmt.Println("Error making request to client:", err)
+		fmt.Println("Error accessing cookie info", err)
 	}
 
-	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
+	if auth, ok := session.Values["authenticated"].(bool); !auth || !ok {
+		temp.ExecuteTemplate(w, "signIn.html", "Please Sign In!")
+	} else {
+		url := "https://jsonplaceholder.typicode.com/albums"
 
-	var albums []album
-	err = json.Unmarshal(body, &albums)
-	if err != nil {
-		log.Println("Error:", err)
+		req, _ := http.NewRequest("GET", url, nil)
+
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			fmt.Println("Error making request to client:", err)
+		}
+
+		defer res.Body.Close()
+		body, _ := ioutil.ReadAll(res.Body)
+
+		var albums []album
+		err = json.Unmarshal(body, &albums)
+		if err != nil {
+			log.Println("Error:", err)
+		}
+
+		temp.ExecuteTemplate(w, "movie.html", albums)
 	}
-
-	temp.ExecuteTemplate(w, "movie.html", albums)
 }
