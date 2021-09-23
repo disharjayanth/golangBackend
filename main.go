@@ -118,7 +118,8 @@ func moviePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if auth, ok := session.Values["authenticated"].(bool); !auth || !ok {
-		temp.ExecuteTemplate(w, "signIn.html", "Please Sign In!")
+		// temp.ExecuteTemplate(w, "signIn.html", "Please Sign In!")
+		http.Redirect(w, r, "/signin", http.StatusSeeOther)
 	} else {
 		url := "https://jsonplaceholder.typicode.com/albums"
 
