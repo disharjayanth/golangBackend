@@ -50,3 +50,7 @@ button {
   cursor: pointer;
   border-radius: 5px;
 }
+
+input {
+  height: 30px;
+}
