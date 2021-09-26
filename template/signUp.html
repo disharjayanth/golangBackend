@@ -8,9 +8,9 @@
       <h1>Sign Up</h1>
       <form onsubmit="/signup/" method="POST">
         <label>User Name:</label>
-        <input name="name" type="text" />
+        <input name="name" type="text" required />
         <label>Password:</label>
-        <input name="password" type="password" />
+        <input name="password" type="password" required />
         <button>Sign Up!</button>
       </form>
       <div class="userAlreadyRegisteredError">{{.}}</div>
